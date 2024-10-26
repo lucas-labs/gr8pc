@@ -1,0 +1,48 @@
+{
+    "files.exclude": {
+        // 🗂️ modules and folders
+        ".gitea": true,
+        "tools": true,
+
+        // ⚙️ config
+        "Taskfile.yml": true,
+        "**/**/*.code-workspace": true,
+        "poetry.lock": true,
+        "poetry.toml": true,
+
+        // 🧼 linters & styles
+        ".ruff.toml": true,
+        "coco.yml": true,
+        ".env": true,
+
+        // 🧪 tests
+        // "tests": true,
+        "conftest.py": true,
+
+        // 🗑️
+        ".task": true, // task-go
+        ".venv": true,
+        ".vscode": true,
+        ".ruff_cache": true,
+        "**/**/__pycache__": true,
+        ".git": true,
+        ".gitignore": true,
+        ".pytest_cache": true,
+
+        // 📝 docs
+        // "**/**/README.md": true
+    },
+    "[python]": {
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.fixAll": "explicit",
+            "source.organizeImports": "explicit"
+        },
+        "editor.defaultFormatter": "charliermarsh.ruff"
+    },   
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "python.analysis.indexing": true,
+    "python.analysis.autoImportCompletions": true,
+}
+

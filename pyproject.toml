@@ -1,0 +1,23 @@
+[project]
+name = "gr8pc-root"
+version = "0.1.0"
+description = "Root"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    'gr8pc',
+    'gr8gen',
+]
+
+[tool.uv.sources]
+gr8pc = { workspace = true }
+gr8gen = { workspace = true }
+
+
+[tool.uv]
+dev-dependencies = [
+    "ruff>=0.7.1",
+]
+
+[tool.uv.workspace]
+members = ["packages/gr8pc", "packages/gr8gen"]
