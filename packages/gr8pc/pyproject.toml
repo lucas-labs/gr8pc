@@ -1,6 +1,6 @@
 [project]
 name = "gr8pc"
-version = "0.1.0"
+version = "0.1.1"
 description = "gr8pc: A High-Level gRPC Wrapper for python"
 readme = "README.md"
 authors = [

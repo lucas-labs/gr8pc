@@ -23,7 +23,7 @@ wheels = [
 
 [[package]]
 name = "gr8gen"
-version = "0.1.0"
+version = "0.1.1"
 source = { editable = "packages/gr8gen" }
 dependencies = [
     { name = "jinja2" },
@@ -34,7 +34,7 @@ requires-dist = [{ name = "jinja2", specifier = ">=3.1.4" }]
 
 [[package]]
 name = "gr8pc"
-version = "0.1.0"
+version = "0.1.1"
 source = { editable = "packages/gr8pc" }
 dependencies = [
     { name = "grpc-interceptor" },
@@ -55,7 +55,7 @@ requires-dist = [
 
 [[package]]
 name = "gr8pc-root"
-version = "0.1.0"
+version = "0.0.0"
 source = { virtual = "." }
 dependencies = [
     { name = "gr8gen" },

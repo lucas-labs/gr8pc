@@ -1,6 +1,6 @@
 [project]
 name = "gr8gen"
-version = "0.1.0"
+version = "0.1.1"
 description = "gr8gen: protobuf generator for gr8pc"
 readme = "README.md"
 authors = [
