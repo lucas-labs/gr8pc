@@ -79,10 +79,10 @@ class BaseServiceMeta(type):
         path: Path = proto_dir / f'{camel_to_snake(string=self.name)}.proto'
 
         # check it exists or raise an error
-        if not path.exists():
-            raise FileNotFoundError(f'Could not find proto file: {path}')
-
+        # if not path.exists():
+        #     raise FileNotFoundError(f'Could not find proto file: {path}')
         # path.write_text(data=self.get_proto())
+
         return path
 
     def get_method(self: 'BaseServiceMeta', method_name: str) -> ServerMethodGRPC:
