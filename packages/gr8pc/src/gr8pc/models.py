@@ -1,7 +1,7 @@
 from functools import partial
 from inspect import isclass
-from types import FunctionType, GenericAlias, ModuleType
-from typing import Any, Iterable, Type, TypeVar, assert_never, get_origin
+from types import FunctionType, GenericAlias, ModuleType, NoneType, UnionType
+from typing import Any, Iterable, Type, TypeVar, _UnionGenericAlias, assert_never, get_origin
 
 from google.protobuf.message import Message as ProtoMessage
 from pydantic import BaseModel, ConfigDict, create_model
@@ -51,6 +51,14 @@ class Message(BaseModel):
             cls.model_fields if model_fields is None else model_fields
         ).items():
             field_type: type | None = field_info.annotation
+
+            if type(field_type) in [UnionType, _UnionGenericAlias]:
+                # if it's a Union between None and X, get X as the field type
+                field_type = next(
+                    (arg for arg in field_type.__args__ if arg is not NoneType),
+                    field_type,
+                )
+
             if isclass(field_type) and issubclass(field_type, Message):
                 messages[field_type.__name__] = field_type
                 if additional_messages := cls.get_additional_messages(

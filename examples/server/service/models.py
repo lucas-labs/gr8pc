@@ -23,11 +23,11 @@ class ComplexModel(Message):
 
 class ComplexRequest(Message):
     id: UUID | None
-    model: ComplexModel
+    model: ComplexModel | None
 
 
 class ComplexResponse(Message):
     id: UUID
-    model: Union[ComplexModel, None]
-    model2: None | ComplexModel
+    model: ComplexModel | None
+    model2: Union[ComplexModel, None]
     model3: Optional[ComplexModel]
