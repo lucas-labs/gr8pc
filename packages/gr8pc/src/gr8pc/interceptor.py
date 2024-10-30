@@ -32,10 +32,6 @@ class ServerInterceptor(AsyncServerInterceptor):
             response = await route(message=message, context=context)
             return response
         except GrpcException as grpc_exc:
-            logger.error(
-                f'{context.peer()} - {route.__qualname__} | '
-                f'{grpc_exc.__class__.__name__} | {grpc_exc.status_code} | {grpc_exc.details}'
-            )
             context.set_code(grpc_exc.status_code)
             context.set_details(grpc_exc.details)
         except SendEmpty as exc:
