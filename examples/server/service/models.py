@@ -28,4 +28,6 @@ class ComplexRequest(Message):
 
 class ComplexResponse(Message):
     id: UUID
-    model: ComplexModel
+    model: Union[ComplexModel, None]
+    model2: None | ComplexModel
+    model3: Optional[ComplexModel]

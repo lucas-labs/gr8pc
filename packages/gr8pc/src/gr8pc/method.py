@@ -1,5 +1,6 @@
 from asyncio import to_thread
-from typing import Any, Callable, Type, assert_never
+from types import NoneType, UnionType
+from typing import Any, Callable, Type, Union, _UnionGenericAlias, assert_never
 from warnings import catch_warnings
 
 from google.protobuf.message import Message as ProtoMessage
@@ -57,10 +58,31 @@ class MethodGRPC:
         dump: dict[str, Any] = message.model_dump(mode='json', warnings=warnings, exclude=exclude)
         params: dict[str, Any] = {}
         for field_name, field_info in message.model_fields.items():
-            if field_info.annotation.__name__ in method.additional_messages:
+            name = getattr(field_info.annotation, '__name__', None)
+
+            if type(field_info.annotation) in (UnionType, Union) or isinstance(
+                field_info.annotation, _UnionGenericAlias
+            ):
+                # check args of the union type are: (type, NoneType) : len is 2 and one of them is
+                # None
+
+                if (
+                    not len(field_info.annotation.__args__) == 2
+                    and None in field_info.annotation.__args__
+                ):
+                    raise ValueError(f'Union type {field_info.annotation} not supported')
+
+                # use the name of the type that is not None
+                name = (
+                    field_info.annotation.__args__[0].__name__
+                    if field_info.annotation.__args__[0] is not NoneType
+                    else field_info.annotation.__args__[1].__name__
+                )
+
+            if name in method.additional_messages:
                 value: ProtoMessage = cls.pydantic_to_proto(
                     message=getattr(message, field_name),
-                    model=method.get_additional_proto(proto_name=field_info.annotation.__name__),
+                    model=method.get_additional_proto(proto_name=name),
                     method=method,
                     warnings=warnings,
                     exclude_types=exclude_types,

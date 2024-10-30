@@ -29,4 +29,6 @@ message ComplexRequest {
 message ComplexResponse {
     string id = 1;
     ComplexModel model = 2;
+    ComplexModel model2 = 3;
+    ComplexModel model3 = 4;
 }

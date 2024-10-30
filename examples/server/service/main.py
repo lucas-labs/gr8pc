@@ -7,4 +7,6 @@ class ExampleService(BaseExampleService):
         return PingResponse(id=request.id)
 
     async def complex(self: 'ExampleService', request: ComplexRequest) -> ComplexResponse:
-        return ComplexResponse(**request.model_dump())
+        rq = request.model_dump()
+
+        return ComplexResponse(**rq, model2=request.model, model3=request.model)
