@@ -34,7 +34,7 @@ requires-dist = [{ name = "jinja2", specifier = ">=3.1.4" }]
 
 [[package]]
 name = "gr8pc"
-version = "0.1.1"
+version = "0.1.2"
 source = { editable = "packages/gr8pc" }
 dependencies = [
     { name = "grpc-interceptor" },
@@ -62,7 +62,7 @@ dependencies = [
     { name = "gr8pc" },
 ]
 
-[package.dev-dependencies]
+[package.dependency-groups]
 dev = [
     { name = "ruff" },
 ]
@@ -73,7 +73,7 @@ requires-dist = [
     { name = "gr8pc", editable = "packages/gr8pc" },
 ]
 
-[package.metadata.requires-dev]
+[package.metadata.dependency-groups]
 dev = [{ name = "ruff", specifier = ">=0.7.1" }]
 
 [[package]]
