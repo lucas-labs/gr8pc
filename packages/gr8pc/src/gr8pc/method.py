@@ -80,13 +80,17 @@ class MethodGRPC:
                 )
 
             if name in method.additional_messages:
-                value: ProtoMessage = cls.pydantic_to_proto(
-                    message=getattr(message, field_name),
-                    model=method.get_additional_proto(proto_name=name),
-                    method=method,
-                    warnings=warnings,
-                    exclude_types=exclude_types,
-                )
+                message = getattr(message, field_name)
+                if message is not None:
+                    value: ProtoMessage = cls.pydantic_to_proto(
+                        message=message,
+                        model=method.get_additional_proto(proto_name=name),
+                        method=method,
+                        warnings=warnings,
+                        exclude_types=exclude_types,
+                    )
+                else:
+                    value = None
             elif field_info.annotation is bytes:
                 value: bytes = getattr(message, field_name)
             else:
