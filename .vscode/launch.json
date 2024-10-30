@@ -13,5 +13,18 @@
             "justMyCode": false,
             "cwd": "${workspaceFolder}/examples/server"
         },
+        {
+            "name": "Examples: Server Proto Generator",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "gr8gen",
+            "justMyCode": false,
+            "args": [
+                "-s",
+                "examples.server.service.main.ExampleService",
+                "-o",
+                "examples/server/proto"
+            ]
+        }
     ]
 }
