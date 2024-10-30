@@ -96,7 +96,16 @@ def parse_type_mapping(
 def parse_field_type(field_name: str, field_type: type) -> dict[str, Any]:
     if proto_buf_type := TYPE_MAPPING.get(field_type):
         return {'name': field_name, 'type': proto_buf_type}
-    elif isinstance(field_type, GenericAlias) and (origin := get_origin(tp=field_type)) is not None:
+
+    if isclass(field_type):
+        if issubclass(field_type, BaseModel):
+            return {'name': field_name, 'type': field_type.__name__}
+        if issubclass(field_type, Enum):
+            return {'name': field_name, 'type': ProtoBufTypes.STRING}
+
+    origin = get_origin(tp=field_type)
+
+    if origin is not None:
         args: list = list(field_type.__args__)
         if origin in (Union, UnionType):
             return parse_type_union(field_name=field_name, field_type=field_type, args=args)
@@ -105,9 +114,5 @@ def parse_field_type(field_name: str, field_type: type) -> dict[str, Any]:
         if issubclass(origin, Iterable):
             return parse_type_sequence(field_name=field_name, field_type=field_type, args=args)
         raise TypeError(f'Field unsupported type `{field_type}`')
-    elif isclass(field_type):
-        if issubclass(field_type, BaseModel):
-            return {'name': field_name, 'type': field_type.__name__}
-        if issubclass(field_type, Enum):
-            return {'name': field_name, 'type': ProtoBufTypes.STRING}
+
     raise TypeError(f'Field unsupported type `{field_type}`')
