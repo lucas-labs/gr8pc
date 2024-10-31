@@ -73,7 +73,7 @@ class Message(BaseModel):
                     if len(args := field_type.__args__) != 1:
                         raise TypeError(
                             f'Field `{field_name}`: type `{field_type}` must have only one subtype'
-                            ', not {len(args)}.'
+                            f', not {len(args)}.'
                         )
                     if isclass(sub_field_type := args[0]) and issubclass(sub_field_type, Message):
                         messages[sub_field_type.__name__] = sub_field_type
