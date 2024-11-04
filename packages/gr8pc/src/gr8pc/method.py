@@ -33,6 +33,20 @@ class MethodGRPC:
     ) -> Message:
         params: dict[str, Any] = {}
         for descriptor, value in message.ListFields():
+            if descriptor.label == descriptor.LABEL_REPEATED:
+                value = [
+                    cls.proto_to_pydantic(
+                        message=message,
+                        model=method.get_additional_message(
+                            message_name=descriptor.message_type.name
+                        ),
+                        method=method,
+                    )
+                    if isinstance(message, ProtoMessage)
+                    else message
+                    for message in value
+                ]
+
             if isinstance(value, ProtoMessage):
                 value: Message = cls.proto_to_pydantic(
                     message=value,
