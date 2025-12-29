@@ -69,6 +69,9 @@ class Message(BaseModel):
                 isinstance(field_type, GenericAlias)
                 and (origin := get_origin(tp=field_type)) is not None
             ):
+                # Skip dict/map types - they don't contain nested messages
+                if issubclass(origin, dict):
+                    continue
                 if issubclass(origin, Iterable):
                     if len(args := field_type.__args__) != 1:
                         raise TypeError(
