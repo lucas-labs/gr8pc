@@ -1,0 +1,12 @@
+// Automatically generated
+
+syntax = "proto3";
+package example_bytes_service;
+
+service ExampleBytesService {
+    rpc ProcessBytes(BytesMessage) returns (BytesMessage) {}
+}
+
+message BytesMessage {
+    bytes bytes = 1;
+}

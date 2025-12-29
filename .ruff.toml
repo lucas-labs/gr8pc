@@ -1,6 +1,7 @@
 line-length = 100
 indent-width = 4
 output-format = "full"
+target-version = "py312"
 
 [format]
 quote-style = "preserve"
@@ -9,8 +10,6 @@ quote-style = "preserve"
 select = ["E", "F", "Q", "I", "ANN", "ASYNC", "W", "S", "A"]
 ignore = [
     "A",         # flake8-builtins https://beta.ruff.rs/docs/settings/#flake8-builtins
-    "ANN101",    # missing-type-self https://beta.ruff.rs/docs/rules/missing-type-self/
-    "ANN102",    # missing-type-cls https://beta.ruff.rs/docs/rules/missing-type-cls/
     "ANN401",    # any-type https://beta.ruff.rs/docs/rules/any-type/
 ]
 
