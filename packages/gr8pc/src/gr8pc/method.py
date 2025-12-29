@@ -1,8 +1,9 @@
 from asyncio import to_thread
 from types import NoneType, UnionType
-from typing import Any, Callable, Type, Union, _UnionGenericAlias, assert_never
+from typing import Any, Callable, Type, Union, _UnionGenericAlias, assert_never, cast
 from warnings import catch_warnings
 
+from google.protobuf.descriptor import FieldDescriptor
 from google.protobuf.message import Message as ProtoMessage
 from grpc import experimental
 from grpc.aio import ServicerContext
@@ -32,28 +33,46 @@ class MethodGRPC:
         cls: Type['MethodGRPC'], message: ProtoMessage, model: Type[Message], method: Method
     ) -> Message:
         params: dict[str, Any] = {}
-        for descriptor, value in message.ListFields():
-            if descriptor.label == descriptor.LABEL_REPEATED:
+        model_fields = model.model_fields
+
+        for field in cast(list[FieldDescriptor], message.DESCRIPTOR.fields):
+            field_name = field.name
+            value = getattr(message, field_name)
+
+            # check if this field is Optional in the Pydantic model
+            pydantic_field = model_fields.get(field_name)
+            is_optional = False
+            if pydantic_field:
+                # check if the annotation includes None (Optional)
+                annotation = pydantic_field.annotation
+                if hasattr(annotation, '__args__'):
+                    is_optional = type(None) in annotation.__args__
+
+            if is_optional and not value and value is not False and value != 0:
+                value = None
+
+            elif field.message_type and field.message_type.GetOptions().map_entry:
+                value = dict(value) if value else {}
+            elif field.is_repeated:
                 value = [
                     cls.proto_to_pydantic(
-                        message=message,
-                        model=method.get_additional_message(
-                            message_name=descriptor.message_type.name
-                        ),
+                        message=item,
+                        model=method.get_additional_message(message_name=field.message_type.name),
                         method=method,
                     )
-                    if isinstance(message, ProtoMessage)
-                    else message
-                    for message in value
+                    if isinstance(item, ProtoMessage)
+                    else item
+                    for item in value
                 ]
-
-            if isinstance(value, ProtoMessage):
-                value: Message = cls.proto_to_pydantic(
+            elif isinstance(value, ProtoMessage):
+                value = cls.proto_to_pydantic(
                     message=value,
-                    model=method.get_additional_message(message_name=descriptor.message_type.name),
+                    model=method.get_additional_message(message_name=field.message_type.name),
                     method=method,
                 )
-            params[descriptor.name] = value
+
+            params[field_name] = value
+
         return model(**params)
 
     @classmethod
