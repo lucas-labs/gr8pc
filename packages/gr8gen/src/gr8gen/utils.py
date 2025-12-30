@@ -64,7 +64,7 @@ def format_docstring(docstring: str | None, indent: int = 0) -> str:
     indent_str = ' ' * indent
 
     if len(lines) == 1:
-        return f'{indent_str}// {lines[0]}'
+        return f'{indent_str}// {lines[0]}\n'
 
     result = f'{indent_str}/**\n'
     for line in lines:
@@ -72,5 +72,5 @@ def format_docstring(docstring: str | None, indent: int = 0) -> str:
             result += f'{indent_str} * {line}\n'
         else:
             result += f'{indent_str} *\n'
-    result += f'{indent_str} */'
+    result += f'{indent_str} */\n'
     return result
