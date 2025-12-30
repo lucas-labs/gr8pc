@@ -1,6 +1,8 @@
 import asyncio
+import inspect
 import logging
 import re
+from typing import AsyncGenerator, Callable
 
 from google.protobuf.message import Message
 from grpc import StatusCode
@@ -21,7 +23,7 @@ class ServerInterceptor(AsyncServerInterceptor):
 
     async def intercept(
         self: 'ServerInterceptor',
-        route: ServerMethodGRPC,
+        route: ServerMethodGRPC | Callable,
         message: Message,
         context: ServicerContext,
         method_name: str,
@@ -29,8 +31,15 @@ class ServerInterceptor(AsyncServerInterceptor):
         response: Message | None = None
 
         try:
-            response = await route(message=message, context=context)
-            return response
+            if asyncio.iscoroutinefunction(route):
+                response = await route(message, context)
+            else:
+                response = route(message, context)
+
+            if self.access_log and inspect.isasyncgen(response):
+                return stream_with_logging(response, context, route, method_name)
+            else:
+                return response
         except GrpcException as grpc_exc:
             context.set_code(grpc_exc.status_code)
             context.set_details(grpc_exc.details)
@@ -51,10 +60,10 @@ class ServerInterceptor(AsyncServerInterceptor):
             context.set_code(StatusCode.INTERNAL)
             context.set_details('Internal Server Error')
         finally:
-            if self.access_log:
-                # log the request in a separate asyncio task
+            if self.access_log and not inspect.isasyncgen(response):
+                # log non-streaming responses in a separate asyncio task
                 asyncio.create_task(
-                    access_log_task(
+                    log_response(
                         context=context,
                         route=route,
                         method_name=method_name,
@@ -63,18 +72,41 @@ class ServerInterceptor(AsyncServerInterceptor):
                 )
 
 
-async def access_log_task(
-    context: ServicerContext, route: ServerMethodGRPC, method_name: str, response: Message | None
+async def stream_with_logging(
+    generator: AsyncGenerator[Message, None],
+    context: ServicerContext,
+    route: ServerMethodGRPC,
+    method_name: str,
+) -> AsyncGenerator[Message, None]:
+    """wrap an async generator to log each yielded message"""
+    message_count = 0
+    async for message in generator:
+        message_count += 1
+        asyncio.create_task(
+            log_response(context, route, method_name, message, streaming_count=message_count)
+        )
+        yield message
+
+
+async def log_response(
+    context: ServicerContext,
+    route: ServerMethodGRPC,
+    method_name: str,
+    response: Message | None = None,
+    streaming_count: int | None = None,
 ) -> None:
     code = context.code() or StatusCode.OK
-    det = context.details()
 
     if code is not StatusCode.OK:
-        msg = f'{context.peer()} - {route.__qualname__} {{{method_name}}} | {code} | {det}'
+        msg = (
+            f'{context.peer()} - {route.__qualname__} '
+            f'{{{method_name}}} | {code} | {context.details()}'
+        )
     else:
-        msg = f'{context.peer()} - {route.__qualname__} {{{method_name}}} | {StatusCode.OK} |'
+        status_part = f'streaming[{streaming_count}]' if streaming_count else StatusCode.OK
+        msg = f'{context.peer()} - {route.__qualname__} {{{method_name}}} | {status_part} |'
         resp = re.sub(r'\n+$', '', f'{response or ""}')
         resp = re.sub(r'(?m)^', '  | ', resp)
         msg = f'{msg}\n{resp}'
 
-    logger.debug(f'{msg}')
+    logger.debug(msg)

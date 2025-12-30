@@ -30,6 +30,7 @@ class GrpcServer:
         *,
         services: tuple[Type[BaseService], ...] = (),
         access_log: bool = False,
+        reflection: bool = False,
     ):
         self.port: int = port
         self.host: str = host
@@ -44,9 +45,15 @@ class GrpcServer:
         self.on_startup: LifespanFunc | None = on_startup
         self.on_shutdown: LifespanFunc | None = on_shutdown
         self.name = name or self.__class__.__name__
+        self.reflection: bool = reflection
 
         for service in services:
             self.add_service(service=service)
+
+        if self.reflection:
+            from ..reflection import apply_reflection
+
+            apply_reflection(server=self.server, services=self.services)
 
     def add_service(self: 'GrpcServer', service: Type[BaseService]) -> None:
         self.services[service.name] = service

@@ -2,7 +2,7 @@
 
 import asyncio
 from pathlib import Path
-from typing import AsyncGenerator
+from typing import Any, AsyncGenerator, Generator
 
 import pytest
 from gr8pc import GrpcServer
@@ -10,7 +10,7 @@ from grpc.aio import Channel, insecure_channel
 
 
 @pytest.fixture(scope='session')
-def event_loop():
+def event_loop() -> Generator[asyncio.AbstractEventLoop, Any, None]:
     """Create an instance of the default event loop for the test session."""
     loop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop
@@ -19,7 +19,7 @@ def event_loop():
 
 @pytest.fixture(scope='session')
 def proto_dir() -> Path:
-    """Proto directory containing .proto files (NOT compiled _pb2.py files)."""
+    """Proto directory containing .proto files."""
     return Path('tests/proto')
 
 

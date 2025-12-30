@@ -16,6 +16,13 @@ dependencies = [
     "pydantic<3",
 ]
 
+[project.optional-dependencies]
+reflection = [
+    "grpcio-reflection>=1.76.0",
+]
+
+
+
 [project.urls]
 Homepage = "https://github.com/lucas-labs/gr8pc"
 Documentation = "https://github.com/lucas-labs/gr8pc"

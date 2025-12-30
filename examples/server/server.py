@@ -12,6 +12,7 @@ def main() -> None:
         name='ExampleGrpc',
         services=(ExampleService,),
         access_log=True,
+        reflection=True,
     )
 
     # or...
