@@ -8,7 +8,7 @@ from typing import Any, Type
 
 from jinja2 import Environment, FileSystemLoader, Template
 
-from .utils import camel_to_snake, snake_to_camel, stl
+from .utils import camel_to_snake, format_docstring, snake_to_camel, stl
 
 __version__ = importlib.metadata.version('gr8gen')
 
@@ -25,7 +25,10 @@ def get_proto(service: Any) -> str:
     service.methods_and_messages()
     template: Template = environment.get_template(name='service.proto.jinja')
     return template.render(
-        service=service, camel_to_snake=camel_to_snake, snake_to_camel=snake_to_camel
+        service=service,
+        camel_to_snake=camel_to_snake,
+        snake_to_camel=snake_to_camel,
+        format_docstring=format_docstring,
     )
 
 

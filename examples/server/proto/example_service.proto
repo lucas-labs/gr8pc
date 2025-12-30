@@ -3,29 +3,37 @@
 syntax = "proto3";
 package example_service;
 
+// Documentation of the entire ExampleService service.
 service ExampleService {
+    // Simple ping service that returns the same ID received in the request.
     rpc Ping(PingRequest) returns (PingResponse) {}
+    // Complex service demonstrating nested message handling.
     rpc Complex(ComplexRequest) returns (ComplexResponse) {}
 }
 
+// A simple ping request model.
 message PingRequest {
     string id = 1;
 }
 
+// A simple ping response model.
 message PingResponse {
     string id = 1;
     string timestamp = 2;
 }
 
+// A complex nested model used in requests and responses.
 message ComplexModel {
     string name = 1;
 }
 
+// A complex request model with optional nested message.
 message ComplexRequest {
     string id = 1;
     ComplexModel model = 2;
 }
 
+// A complex response model with nested messages.
 message ComplexResponse {
     string id = 1;
     ComplexModel model = 2;

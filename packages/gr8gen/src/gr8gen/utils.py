@@ -51,3 +51,26 @@ def snake_to_camel(string: str) -> str:
     return sub(
         pattern=r'_([a-zA-Z])', repl=lambda match: match.group(1).upper(), string=string.title()
     )
+
+
+def format_docstring(docstring: str | None, indent: int = 0) -> str:
+    if not docstring:
+        return ''
+
+    lines = [line.strip() for line in docstring.strip().splitlines()]
+    if not lines:
+        return ''
+
+    indent_str = ' ' * indent
+
+    if len(lines) == 1:
+        return f'{indent_str}// {lines[0]}'
+
+    result = f'{indent_str}/**\n'
+    for line in lines:
+        if line:
+            result += f'{indent_str} * {line}\n'
+        else:
+            result += f'{indent_str} *\n'
+    result += f'{indent_str} */'
+    return result
