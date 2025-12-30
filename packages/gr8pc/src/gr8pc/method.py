@@ -113,10 +113,10 @@ class MethodGRPC:
                 )
 
             if name in method.additional_messages:
-                message = getattr(message, field_name)
-                if message is not None:
+                inner_message = getattr(message, field_name)
+                if inner_message is not None:
                     value: ProtoMessage = cls.pydantic_to_proto(
-                        message=message,
+                        message=inner_message,
                         model=method.get_additional_proto(proto_name=name),
                         method=method,
                         warnings=warnings,
